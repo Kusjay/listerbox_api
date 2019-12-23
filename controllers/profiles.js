@@ -7,7 +7,9 @@ exports.getProfiles = async (req, res, next) => {
   try {
     const profiles = await Profile.find();
 
-    res.status(200).json({ success: true, data: profiles });
+    res
+      .status(200)
+      .json({ success: true, count: profiles.length, data: profiles });
   } catch (err) {
     res.status(400).json({ success: false });
   }
@@ -49,17 +51,36 @@ exports.createProfile = async (req, res, next) => {
 // @desc    Update profile
 // @route   PUT /api/v1/profiles/:id
 // @access  Private
-exports.updateProfile = (req, res, next) => {
-  res
-    .status(200)
-    .json({ success: true, msg: `Update profile ${req.params.id}` });
+exports.updateProfile = async (req, res, next) => {
+  try {
+    const profile = await Profile.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true
+    });
+
+    if (!profile) {
+      return res.status(400).json({ success: false });
+    }
+
+    res.status(200).json({ success: true, data: profile });
+  } catch (error) {
+    res.status(200).json({ success: true, data: profile });
+  }
 };
 
 // @desc    Delete profile
 // @route   DELETE /api/v1/profiles/:id
 // @access  Private
-exports.deleteProfile = (req, res, next) => {
-  res
-    .status(200)
-    .json({ success: true, msg: `Delete profile ${req.params.id}` });
+exports.deleteProfile = async (req, res, next) => {
+  try {
+    const profile = await Profile.findByIdAndDelete(req.params.id);
+
+    if (!profile) {
+      return res.status(400).json({ success: false });
+    }
+
+    res.status(200).json({ success: true, data: {} });
+  } catch (error) {
+    res.status(200).json({ success: true, data: profile });
+  }
 };
