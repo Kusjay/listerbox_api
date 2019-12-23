@@ -3,15 +3,31 @@ const Profile = require('../models/Profile');
 // @desc    Get all profiles
 // @route   GET /api/v1/profiles
 // @access  Public
-exports.getProfiles = (req, res, next) => {
-  res.status(200).json({ success: true, msg: 'Show all profiles' });
+exports.getProfiles = async (req, res, next) => {
+  try {
+    const profiles = await Profile.find();
+
+    res.status(200).json({ success: true, data: profiles });
+  } catch (err) {
+    res.status(400).json({ success: false });
+  }
 };
 
 // @desc    Get single profile
 // @route   GET /api/v1/profiles/:id
 // @access  Public
-exports.getProfile = (req, res, next) => {
-  res.status(200).json({ success: true, msg: `Show profile ${req.params.id}` });
+exports.getProfile = async (req, res, next) => {
+  try {
+    const profile = await Profile.findById(req.params.id);
+
+    if (!profile) {
+      return res.status(400).json({ success: false });
+    }
+
+    res.status(200).json({ success: true, data: profile });
+  } catch (err) {
+    res.status(400).json({ success: false });
+  }
 };
 
 // @desc    Create new profile
