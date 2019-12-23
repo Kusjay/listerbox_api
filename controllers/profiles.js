@@ -1,3 +1,5 @@
+const Profile = require('../models/Profile');
+
 // @desc    Get all profiles
 // @route   GET /api/v1/profiles
 // @access  Public
@@ -15,8 +17,17 @@ exports.getProfile = (req, res, next) => {
 // @desc    Create new profile
 // @route   POST /api/v1/profiles
 // @access  Private
-exports.createProfile = (req, res, next) => {
-  res.status(200).json({ success: true, msg: 'Create new profile' });
+exports.createProfile = async (req, res, next) => {
+  try {
+    const profile = await Profile.create(req.body);
+
+    res.status(201).json({
+      success: true,
+      data: profile
+    });
+  } catch (err) {
+    res.status(400).json({ success: false });
+  }
 };
 
 // @desc    Update profile

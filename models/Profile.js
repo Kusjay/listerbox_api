@@ -4,8 +4,9 @@ const ProfileSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, 'Please add a profile name'],
+    unique: true,
     trim: true,
-    maxlength: [50, 'profile name can not be more than 50 characters']
+    maxlength: [50, 'Profile name can not be more than 50 characters']
   },
   slug: String,
   description: {
