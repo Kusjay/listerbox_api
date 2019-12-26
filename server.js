@@ -12,6 +12,7 @@ connectDB();
 
 // Route files
 const profiles = require('./routes/profiles');
+const tasks = require('./routes/tasks');
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(express.json());
 
 // Mount routers
 app.use('/api/v1/profiles', profiles);
+app.use('/api/v1/tasks', tasks);
 
 app.use(errorHandler);
 

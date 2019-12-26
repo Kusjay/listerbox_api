@@ -7,7 +7,13 @@ const {
   deleteProfile
 } = require('../controllers/profiles');
 
+// Include other resource routers
+const taskRouter = require('./tasks');
+
 const router = express.Router();
+
+// Re-route into other resource routers
+router.use('/:profileId/tasks', taskRouter);
 
 router
   .route('/')
