@@ -6,7 +6,15 @@ const Profile = require('../models/Profile');
 // @route   GET /api/v1/profiles
 // @access  Public
 exports.getProfiles = asyncHandler(async (req, res, next) => {
-  const profiles = await Profile.find();
+  let query;
+
+  let queryStr = JSON.stringify(req.query);
+
+  queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
+
+  query = Profile.find(JSON.parse(queryStr));
+
+  const profiles = await query;
 
   res
     .status(200)

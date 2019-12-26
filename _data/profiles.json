@@ -6,7 +6,8 @@
     "description": "I am a cleaner, and I make things look good",
     "phone": "09090112233",
     "email": "john@gmail.com",
-    "address": "999C, Danmole St, Victoria Island, Lagos"
+    "address": "999C, Danmole St, Victoria Island, Lagos",
+    "averageCost": 5000
   },
   {
     "_id": "5d713a66ec8f2b88b8f830b8",
@@ -15,7 +16,8 @@
     "description": "I am a plumber, and also a laundry man",
     "phone": "09090112233",
     "email": "sam@gmail.com",
-    "address": "Plot 161E, Idejo Street, Off Adeola Odeku Street, Victoria Island, Lagos State"
+    "address": "Plot 161E, Idejo Street, Off Adeola Odeku Street, Victoria Island, Lagos State",
+    "averageCost": 8000
   },
   {
     "_id": "5d725a037b292f5f8ceff787",
@@ -24,7 +26,8 @@
     "description": "I am a cook, and I offer with house help",
     "phone": "09090112233",
     "email": "mary@gmail.com",
-    "address": "13, Keffi Street, Off Awolowo Road, Ikoyi, Lagos State"
+    "address": "Plot 45 Genesis E-branch Trans Amadi, Obio/Akpor, Port Harcourt",
+    "averageCost": 10000
   },
   {
     "_id": "5d725a1b7b292f5f8ceff788",
@@ -33,6 +36,7 @@
     "description": "I am a delivery man, and I can help deliver anything",
     "phone": "09090112233",
     "email": "kevin@gmail.com",
-    "address": "48 Marina Street, Lagos Island, Lagos State"
+    "address": "Plot 211, Adetokunbo Ademola Crescent, Cadastral Zone, Wuse 2, Abuja, Abuja",
+    "averageCost": 15000
   }
 ]
