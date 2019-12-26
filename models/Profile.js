@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify');
 
 const ProfileSchema = new mongoose.Schema({
   name: {
@@ -61,6 +62,12 @@ const ProfileSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
+});
+
+// Create profile slug from the name
+ProfileSchema.pre('save', function(next) {
+  this.slug = slugify(this.name, { lower: true });
+  next();
 });
 
 module.exports = mongoose.model('Profile', ProfileSchema);
