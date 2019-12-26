@@ -8,6 +8,7 @@ dotenv.config({ path: './config/config.env' });
 
 // Load models
 const Profile = require('./models/Profile');
+const Task = require('./models/Task');
 
 // Connect to DB
 mongoose.connect(process.env.MONGO_URI, {
@@ -22,10 +23,15 @@ const profiles = JSON.parse(
   fs.readFileSync(`${__dirname}/_data/profiles.json`, 'utf-8')
 );
 
+const tasks = JSON.parse(
+  fs.readFileSync(`${__dirname}/_data/tasks.json`, 'utf-8')
+);
+
 // Import into DB
 const importData = async () => {
   try {
     await Profile.create(profiles);
+    await Task.create(tasks);
 
     console.log('Data Imported...'.green.inverse);
     process.exit();
@@ -38,6 +44,7 @@ const importData = async () => {
 const deleteData = async () => {
   try {
     await Profile.deleteMany();
+    await Task.deleteMany();
 
     console.log('Data Destroyed...'.red.inverse);
     process.exit();

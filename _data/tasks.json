@@ -10,9 +10,9 @@
   },
   {
     "_id": "5d725c84c4ded7bcb480eaa0",
-    "title": "Handy Man & House Help",
+    "title": "Handy Person & House Help",
     "description": "Very exprienced handy man and a house help",
-    "categories": ["Handy Man", "House Help"],
+    "categories": ["Handy Person", "House Help"],
     "price": 4000,
     "profile": "5d713995b721c3bb38c1f5d0",
     "user": "5d7a514b5d2c12c7449be045"
@@ -28,9 +28,9 @@
   },
   {
     "_id": "5d725cd2c4ded7bcb480eaa2",
-    "title": "Laundry Man",
+    "title": "Laundry Work",
     "description": "Very exprienced laundry man",
-    "categories": ["Laundry"],
+    "categories": ["Laundry Person"],
     "price": 3000,
     "profile": "5d713a66ec8f2b88b8f830b8",
     "user": "5d7a514b5d2c12c7449be046"
@@ -39,7 +39,7 @@
     "_id": "5d725ce8c4ded7bcb480eaa3",
     "title": "House Help",
     "description": "Very exprienced help man",
-    "categories": ["Help Man"],
+    "categories": ["House Help"],
     "price": 2000,
     "profile": "5d725a037b292f5f8ceff787",
     "user": "5c8a1d5b0190b214360dc031"
@@ -48,7 +48,7 @@
     "_id": "5d725cfec4ded7bcb480eaa4",
     "title": "Delivery Man",
     "description": "Very exprienced delivery man",
-    "categories": ["Delivery Man"],
+    "categories": ["Delivery Person"],
     "price": 2000,
     "profile": "5d725a037b292f5f8ceff787",
     "user": "5c8a1d5b0190b214360dc031"
