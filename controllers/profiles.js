@@ -12,7 +12,7 @@ exports.getProfiles = async (req, res, next) => {
       .status(200)
       .json({ success: true, count: profiles.length, data: profiles });
   } catch (err) {
-    res.status(400).json({ success: false });
+    next(err);
   }
 };
 
@@ -31,9 +31,7 @@ exports.getProfile = async (req, res, next) => {
 
     res.status(200).json({ success: true, data: profile });
   } catch (err) {
-    next(
-      new ErrorResponse(`Profile not found with id of ${req.params.id}`, 404)
-    );
+    next(err);
   }
 };
 
@@ -49,7 +47,7 @@ exports.createProfile = async (req, res, next) => {
       data: profile
     });
   } catch (err) {
-    res.status(400).json({ success: false });
+    next(err);
   }
 };
 
@@ -64,12 +62,14 @@ exports.updateProfile = async (req, res, next) => {
     });
 
     if (!profile) {
-      return res.status(400).json({ success: false });
+      return next(
+        new ErrorResponse(`Profile not found with id of ${req.params.id}`, 404)
+      );
     }
 
     res.status(200).json({ success: true, data: profile });
-  } catch (error) {
-    res.status(200).json({ success: true, data: profile });
+  } catch (err) {
+    next(err);
   }
 };
 
@@ -81,11 +81,13 @@ exports.deleteProfile = async (req, res, next) => {
     const profile = await Profile.findByIdAndDelete(req.params.id);
 
     if (!profile) {
-      return res.status(400).json({ success: false });
+      return next(
+        new ErrorResponse(`Profile not found with id of ${req.params.id}`, 404)
+      );
     }
 
     res.status(200).json({ success: true, data: {} });
-  } catch (error) {
-    res.status(200).json({ success: true, data: profile });
+  } catch (err) {
+    next(err);
   }
 };
