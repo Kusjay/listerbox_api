@@ -12,7 +12,10 @@ exports.getTasks = asyncHandler(async (req, res, next) => {
   if (req.params.profileId) {
     query = Task.find({ profile: req.params.profileId });
   } else {
-    query = Task.find();
+    query = Task.find().populate({
+      path: 'profile',
+      select: 'name'
+    });
   }
 
   const tasks = await query;

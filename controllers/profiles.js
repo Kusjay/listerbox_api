@@ -24,7 +24,10 @@ exports.getProfiles = asyncHandler(async (req, res, next) => {
   queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
 
   // Finding resource
-  query = Profile.find(JSON.parse(queryStr));
+  query = Profile.find(JSON.parse(queryStr)).populate({
+    path: 'tasks',
+    select: 'title description price'
+  });
 
   // Select Fields
   if (req.query.select) {
@@ -69,14 +72,12 @@ exports.getProfiles = asyncHandler(async (req, res, next) => {
     };
   }
 
-  res
-    .status(200)
-    .json({
-      success: true,
-      count: profiles.length,
-      pagination,
-      data: profiles
-    });
+  res.status(200).json({
+    success: true,
+    count: profiles.length,
+    pagination,
+    data: profiles
+  });
 });
 
 // @desc    Get single profile
@@ -128,13 +129,15 @@ exports.updateProfile = asyncHandler(async (req, res, next) => {
 // @route   DELETE /api/v1/profiles/:id
 // @access  Private
 exports.deleteProfile = asyncHandler(async (req, res, next) => {
-  const profile = await Profile.findByIdAndDelete(req.params.id);
+  const profile = await Profile.findById(req.params.id);
 
   if (!profile) {
     return next(
       new ErrorResponse(`Profile not found with id of ${req.params.id}`, 404)
     );
   }
+
+  profile.remove();
 
   res.status(200).json({ success: true, data: {} });
 });
