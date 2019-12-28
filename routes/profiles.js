@@ -8,6 +8,9 @@ const {
   profilePhotoUpload
 } = require('../controllers/profiles');
 
+const Profile = require('../models/Profile');
+const advancedResults = require('../middleware/advancedResults');
+
 // Include other resource routers
 const taskRouter = require('./tasks');
 
@@ -20,7 +23,13 @@ router.route('/:id/photo').put(profilePhotoUpload);
 
 router
   .route('/')
-  .get(getProfiles)
+  .get(
+    advancedResults(Profile, {
+      path: 'tasks',
+      select: 'title description price'
+    }),
+    getProfiles
+  )
   .post(createProfile);
 
 router

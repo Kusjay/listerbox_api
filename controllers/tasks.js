@@ -3,29 +3,22 @@ const asyncHandler = require('../middleware/async');
 const Task = require('../models/Task');
 const Profile = require('../models/Profile');
 
-// @desc    Get single task
+// @desc    Get all task
 // @route   GET /api/v1/tasks
 // @route   GET /api/v1/profiles/:profileId/tasks
 // @access  Public
 exports.getTasks = asyncHandler(async (req, res, next) => {
-  let query;
-
   if (req.params.profileId) {
-    query = Task.find({ profile: req.params.profileId });
-  } else {
-    query = Task.find().populate({
-      path: 'profile',
-      select: 'name'
+    const tasks = await Task.find({ profile: req.params.profileId });
+
+    return res.status(200).json({
+      success: true,
+      count: tasks.length,
+      data: tasks
     });
+  } else {
+    res.status(200).json(res.advancedResults);
   }
-
-  const tasks = await query;
-
-  res.status(200).json({
-    success: true,
-    count: tasks.length,
-    data: tasks
-  });
 });
 
 // @desc    Get single task

@@ -7,11 +7,20 @@ const {
   deleteTask
 } = require('../controllers/tasks');
 
+const Task = require('../models/Task');
+const advancedResults = require('../middleware/advancedResults');
+
 const router = express.Router({ mergeParams: true });
 
 router
   .route('/')
-  .get(getTasks)
+  .get(
+    advancedResults(Task, {
+      path: 'profile',
+      select: 'name'
+    }),
+    getTasks
+  )
   .post(addTask);
 
 router
