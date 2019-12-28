@@ -69,3 +69,42 @@ exports.addTask = asyncHandler(async (req, res, next) => {
     data: task
   });
 });
+
+// @desc    Update task
+// @route   PUT /api/v1/tasks/:id
+// @access  Private
+exports.updateTask = asyncHandler(async (req, res, next) => {
+  let task = await Task.findById(req.params.id);
+
+  if (!task) {
+    return next(new ErrorResponse(`No task with id of ${req.params.id}`), 404);
+  }
+
+  task = await Task.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true
+  });
+
+  res.status(200).json({
+    success: true,
+    data: task
+  });
+});
+
+// @desc    Delete task
+// @route   DELETE /api/v1/tasks/:id
+// @access  Private
+exports.deleteTask = asyncHandler(async (req, res, next) => {
+  const task = await Task.findById(req.params.id);
+
+  if (!task) {
+    return next(new ErrorResponse(`No task with id of ${req.params.id}`), 404);
+  }
+
+  await task.remove();
+
+  res.status(200).json({
+    success: true,
+    data: {}
+  });
+});

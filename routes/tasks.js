@@ -1,5 +1,11 @@
 const express = require('express');
-const { getTasks, getTask, addTask } = require('../controllers/tasks');
+const {
+  getTasks,
+  getTask,
+  addTask,
+  updateTask,
+  deleteTask
+} = require('../controllers/tasks');
 
 const router = express.Router({ mergeParams: true });
 
@@ -8,6 +14,10 @@ router
   .get(getTasks)
   .post(addTask);
 
-router.route('/:id').get(getTask);
+router
+  .route('/:id')
+  .get(getTask)
+  .put(updateTask)
+  .delete(deleteTask);
 
 module.exports = router;
