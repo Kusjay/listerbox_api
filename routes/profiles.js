@@ -4,7 +4,8 @@ const {
   getProfile,
   createProfile,
   updateProfile,
-  deleteProfile
+  deleteProfile,
+  profilePhotoUpload
 } = require('../controllers/profiles');
 
 // Include other resource routers
@@ -14,6 +15,8 @@ const router = express.Router();
 
 // Re-route into other resource routers
 router.use('/:profileId/tasks', taskRouter);
+
+router.route('/:id/photo').put(profilePhotoUpload);
 
 router
   .route('/')
