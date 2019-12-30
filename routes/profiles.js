@@ -16,10 +16,12 @@ const taskRouter = require('./tasks');
 
 const router = express.Router();
 
+const { protect } = require('../middleware/auth');
+
 // Re-route into other resource routers
 router.use('/:profileId/tasks', taskRouter);
 
-router.route('/:id/photo').put(profilePhotoUpload);
+router.route('/:id/photo').put(protect, profilePhotoUpload);
 
 router
   .route('/')
@@ -30,12 +32,12 @@ router
     }),
     getProfiles
   )
-  .post(createProfile);
+  .post(protect, createProfile);
 
 router
   .route('/:id')
   .get(getProfile)
-  .put(updateProfile)
-  .delete(deleteProfile);
+  .put(protect, updateProfile)
+  .delete(protect, deleteProfile);
 
 module.exports = router;

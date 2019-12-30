@@ -12,6 +12,8 @@ const advancedResults = require('../middleware/advancedResults');
 
 const router = express.Router({ mergeParams: true });
 
+const { protect } = require('../middleware/auth');
+
 router
   .route('/')
   .get(
@@ -21,12 +23,12 @@ router
     }),
     getTasks
   )
-  .post(addTask);
+  .post(protect, addTask);
 
 router
   .route('/:id')
   .get(getTask)
-  .put(updateTask)
-  .delete(deleteTask);
+  .put(protect, updateTask)
+  .delete(protect, deleteTask);
 
 module.exports = router;
