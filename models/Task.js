@@ -38,6 +38,11 @@ const TaskSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: 'Profile',
     required: true
+  },
+  user: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'User',
+    required: true
   }
 });
 
