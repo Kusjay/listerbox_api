@@ -16,12 +16,14 @@ const taskRouter = require('./tasks');
 
 const router = express.Router();
 
-const { protect } = require('../middleware/auth');
+const { protect, authorize } = require('../middleware/auth');
 
 // Re-route into other resource routers
 router.use('/:profileId/tasks', taskRouter);
 
-router.route('/:id/photo').put(protect, profilePhotoUpload);
+router
+  .route('/:id/photo')
+  .put(protect, authorize('Tasker', 'Admin'), profilePhotoUpload);
 
 router
   .route('/')
@@ -32,12 +34,12 @@ router
     }),
     getProfiles
   )
-  .post(protect, createProfile);
+  .post(protect, authorize('Tasker', 'User', 'Admin'), createProfile);
 
 router
   .route('/:id')
   .get(getProfile)
-  .put(protect, updateProfile)
-  .delete(protect, deleteProfile);
+  .put(protect, authorize('Tasker', 'User', 'Admin'), updateProfile)
+  .delete(protect, authorize('Tasker', 'User', 'Admin'), deleteProfile);
 
 module.exports = router;

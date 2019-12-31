@@ -12,7 +12,7 @@ const advancedResults = require('../middleware/advancedResults');
 
 const router = express.Router({ mergeParams: true });
 
-const { protect } = require('../middleware/auth');
+const { protect, authorize } = require('../middleware/auth');
 
 router
   .route('/')
@@ -23,12 +23,12 @@ router
     }),
     getTasks
   )
-  .post(protect, addTask);
+  .post(protect, authorize('Tasker', 'Admin'), addTask);
 
 router
   .route('/:id')
   .get(getTask)
-  .put(protect, updateTask)
-  .delete(protect, deleteTask);
+  .put(protect, authorize('Tasker', 'Admin'), updateTask)
+  .delete(protect, authorize('Tasker', 'Admin'), deleteTask);
 
 module.exports = router;
