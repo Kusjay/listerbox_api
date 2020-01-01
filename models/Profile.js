@@ -100,7 +100,7 @@ ProfileSchema.pre('save', async function(next) {
   next();
 });
 
-// Cascade delete courses when a bootcamp is deleted
+// Cascade delete tasks when a profile is deleted
 ProfileSchema.pre('remove', async function(next) {
   await this.model('Task').deleteMany({ profile: this._id });
 });

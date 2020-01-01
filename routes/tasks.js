@@ -9,10 +9,16 @@ const {
 
 const Task = require('../models/Task');
 
+// Include other resource routers
+const reviewRouter = require('./reviews');
+
 const router = express.Router({ mergeParams: true });
 
 const advancedResults = require('../middleware/advancedResults');
 const { protect, authorize } = require('../middleware/auth');
+
+// Re-route into other resource routers
+router.use('/:taskId/reviews', reviewRouter);
 
 router
   .route('/')
