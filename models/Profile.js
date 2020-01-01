@@ -50,11 +50,6 @@ const ProfileSchema = new mongoose.Schema(
       zipcode: String,
       country: String
     },
-    averageRating: {
-      type: Number,
-      min: [1, 'Rating must be at least 1'],
-      max: [10, 'Rating can not be more than 10']
-    },
     photo: {
       type: String,
       default: 'no-photo.jpg'
