@@ -9,17 +9,21 @@ const {
 } = require('../controllers/profiles');
 
 const Profile = require('../models/Profile');
-const advancedResults = require('../middleware/advancedResults');
 
 // Include other resource routers
 const taskRouter = require('./tasks');
 
 const router = express.Router();
 
+const advancedResults = require('../middleware/advancedResults');
+const { protect, authorize } = require('../middleware/auth');
+
 // Re-route into other resource routers
 router.use('/:profileId/tasks', taskRouter);
 
-router.route('/:id/photo').put(profilePhotoUpload);
+router
+  .route('/:id/photo')
+  .put(protect, authorize('Tasker', 'Admin'), profilePhotoUpload);
 
 router
   .route('/')
@@ -30,12 +34,12 @@ router
     }),
     getProfiles
   )
-  .post(createProfile);
+  .post(protect, authorize('Tasker', 'User', 'Admin'), createProfile);
 
 router
   .route('/:id')
   .get(getProfile)
-  .put(updateProfile)
-  .delete(deleteProfile);
+  .put(protect, authorize('Tasker', 'User', 'Admin'), updateProfile)
+  .delete(protect, authorize('Tasker', 'User', 'Admin'), deleteProfile);
 
 module.exports = router;

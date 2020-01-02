@@ -8,9 +8,17 @@ const {
 } = require('../controllers/tasks');
 
 const Task = require('../models/Task');
-const advancedResults = require('../middleware/advancedResults');
+
+// Include other resource routers
+const reviewRouter = require('./reviews');
 
 const router = express.Router({ mergeParams: true });
+
+const advancedResults = require('../middleware/advancedResults');
+const { protect, authorize } = require('../middleware/auth');
+
+// Re-route into other resource routers
+router.use('/:taskId/reviews', reviewRouter);
 
 router
   .route('/')
@@ -21,12 +29,12 @@ router
     }),
     getTasks
   )
-  .post(addTask);
+  .post(protect, authorize('Tasker', 'Admin'), addTask);
 
 router
   .route('/:id')
   .get(getTask)
-  .put(updateTask)
-  .delete(deleteTask);
+  .put(protect, authorize('Tasker', 'Admin'), updateTask)
+  .delete(protect, authorize('Tasker', 'Admin'), deleteTask);
 
 module.exports = router;

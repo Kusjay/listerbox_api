@@ -45,6 +45,7 @@ exports.getTask = asyncHandler(async (req, res, next) => {
 // @access  Private
 exports.addTask = asyncHandler(async (req, res, next) => {
   req.body.profile = req.params.profileId;
+  req.body.user = req.user.id;
 
   const profile = await Profile.findById(req.params.profileId);
 
@@ -52,6 +53,16 @@ exports.addTask = asyncHandler(async (req, res, next) => {
     return next(
       new ErrorResponse(`No profile with id of ${req.params.profileId}`),
       404
+    );
+  }
+
+  // Make sure user is profile owner
+  if (profile.user.toString() !== req.user.id && req.user.role !== 'Admin') {
+    return next(
+      new ErrorResponse(
+        `User ${req.user.id} is not authorized to add a task to profile ${profile._id}`,
+        401
+      )
     );
   }
 
@@ -73,6 +84,16 @@ exports.updateTask = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(`No task with id of ${req.params.id}`), 404);
   }
 
+  // Make sure user is task owner
+  if (task.user.toString() !== req.user.id && req.user.role !== 'Admin') {
+    return next(
+      new ErrorResponse(
+        `User ${req.user.id} is not authorized to update task ${task._id}`,
+        401
+      )
+    );
+  }
+
   task = await Task.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true
@@ -92,6 +113,16 @@ exports.deleteTask = asyncHandler(async (req, res, next) => {
 
   if (!task) {
     return next(new ErrorResponse(`No task with id of ${req.params.id}`), 404);
+  }
+
+  // Make sure user is task owner
+  if (task.user.toString() !== req.user.id && req.user.role !== 'Admin') {
+    return next(
+      new ErrorResponse(
+        `User ${req.user.id} is not authorized to delete task ${task._id}`,
+        401
+      )
+    );
   }
 
   await task.remove();

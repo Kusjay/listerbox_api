@@ -50,11 +50,6 @@ const ProfileSchema = new mongoose.Schema(
       zipcode: String,
       country: String
     },
-    averageRating: {
-      type: Number,
-      min: [1, 'Rating must be at least 1'],
-      max: [10, 'Rating can not be more than 10']
-    },
     photo: {
       type: String,
       default: 'no-photo.jpg'
@@ -62,6 +57,11 @@ const ProfileSchema = new mongoose.Schema(
     createdAt: {
       type: Date,
       default: Date.now
+    },
+    user: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'User',
+      required: true
     }
   },
   {
@@ -95,7 +95,7 @@ ProfileSchema.pre('save', async function(next) {
   next();
 });
 
-// Cascade delete courses when a bootcamp is deleted
+// Cascade delete tasks when a profile is deleted
 ProfileSchema.pre('remove', async function(next) {
   await this.model('Task').deleteMany({ profile: this._id });
 });
