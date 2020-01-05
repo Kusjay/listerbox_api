@@ -62,9 +62,22 @@ TaskSchema.pre('remove', async function(next) {
   await this.model('Review').deleteMany({ task: this._id });
 });
 
-// Reverse populate with virtuals
+// Cascade delete requests when a task is deleted
+TaskSchema.pre('remove', async function(next) {
+  await this.model('Request').deleteMany({ task: this._id });
+});
+
+// Reverse populate with virtuals for Reviews
 TaskSchema.virtual('reviews', {
   ref: 'Review',
+  localField: '_id',
+  foreignField: 'task',
+  justOne: false
+});
+
+// Reverse populate with virtuals for Requests
+TaskSchema.virtual('requests', {
+  ref: 'Request',
   localField: '_id',
   foreignField: 'task',
   justOne: false
