@@ -25,3 +25,21 @@ exports.addRequest = asyncHandler(async (req, res, next) => {
     date: request
   });
 });
+
+// @desc    Get all requests
+// @desc    GET /api/v1/requests
+// @route   GET /api/v1/tasks/:taskId/requests
+// @access  Private
+exports.getRequests = asyncHandler(async (req, res, next) => {
+  if (req.params.taskId) {
+    const requests = await Request.find({ task: req.params.taskId });
+
+    return res.status(200).json({
+      success: true,
+      count: requests.length,
+      data: requests
+    });
+  } else {
+    res.status(200).json(res.advancedResults);
+  }
+});
