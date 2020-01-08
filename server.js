@@ -19,6 +19,7 @@ const tasks = require('./routes/tasks');
 const auth = require('./routes/auth');
 const users = require('./routes/users');
 const reviews = require('./routes/reviews');
+const requests = require('./routes/requests');
 const payments = require('./routes/payments');
 
 const app = express();
@@ -41,6 +42,7 @@ app.use('/api/v1/tasks', tasks);
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/users', users);
 app.use('/api/v1/reviews', reviews);
+app.use('/api/v1/requests', requests);
 app.use('/api/v1/payments', payments);
 
 app.use(errorHandler);

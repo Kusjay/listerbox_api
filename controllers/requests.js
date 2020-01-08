@@ -43,3 +43,53 @@ exports.getRequests = asyncHandler(async (req, res, next) => {
     res.status(200).json(res.advancedResults);
   }
 });
+
+// @desc    Get single request
+// @desc    GET /api/v1/requests/:id
+// @access  Private
+exports.getRequest = asyncHandler(async (req, res, next) => {
+  const request = await Request.findById(req.params.id).populate({
+    path: 'task',
+    select: 'title'
+  });
+
+  if (!request) {
+    return next(
+      new ErrorResponse(`No request found with the id of ${req.params.id}`),
+      404
+    );
+  }
+
+  res.status(200).json({
+    success: true,
+    data: request
+  });
+});
+
+// @desc    Update request
+// @route   PUT /api/v1/request/:id
+// @access  Private
+exports.updateRequest = asyncHandler(async (req, res, next) => {
+  let request = await Request.findById(req.params.id);
+
+  if (!request) {
+    return next(
+      new ErrorResponse(`No request with the id of ${req.params.id}`, 404)
+    );
+  }
+
+  // Make sure the request belongs to user or user is admin
+  if (request.user.toString() !== req.user.id && req.user.role !== 'Admin') {
+    return next(new ErrorResponse(`Not authorized to update request`, 401));
+  }
+
+  request = await Request.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true
+  });
+
+  res.status(200).json({
+    success: true,
+    data: request
+  });
+});
