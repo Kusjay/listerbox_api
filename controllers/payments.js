@@ -225,7 +225,6 @@ exports.getTransaction = asyncHandler(async (req, res, next) => {
       return paymenData;
     }
   );
-  console.log(paymentData);
 
   res.status(200).json({
     success: true,

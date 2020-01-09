@@ -93,3 +93,28 @@ exports.updateRequest = asyncHandler(async (req, res, next) => {
     data: request
   });
 });
+
+// @desc    Delete request
+// @route   DELETE /api/v1/request/:id
+// @access  Private/Admin
+exports.deleteRequest = asyncHandler(async (req, res, next) => {
+  const request = await Request.findById(req.params.id);
+
+  if (!request) {
+    return next(
+      new ErrorResponse(`No request with the id odf ${req.params.id}`, 404)
+    );
+  }
+
+  // Make sure only admin can delete request
+  if (req.user.role !== 'Admin') {
+    return next(new ErrorResponse(`Not authorized to delete request`, 401));
+  }
+
+  await request.remove();
+
+  res.status(200).json({
+    success: true,
+    data: {}
+  });
+});

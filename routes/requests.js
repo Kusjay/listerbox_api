@@ -3,7 +3,8 @@ const {
   addRequest,
   getRequests,
   getRequest,
-  updateRequest
+  updateRequest,
+  deleteRequest
 } = require('../controllers/requests');
 
 const Request = require('../models/Request');
@@ -25,7 +26,8 @@ router
 
 router
   .route('/:id')
-  .get(protect, authorize('Admin'), getRequest)
-  .put(protect, authorize('User', 'Admin'), updateRequest);
+  .get(protect, authorize('User', 'Admin'), getRequest)
+  .put(protect, authorize('User', 'Admin'), updateRequest)
+  .delete(protect, authorize('Admin'), deleteRequest);
 
 module.exports = router;

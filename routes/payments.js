@@ -6,9 +6,10 @@ const {
   getTransaction
 } = require('../controllers/payments');
 
+const Payment = require('../models/Payment');
+
 const router = express.Router();
 
-const advancedResults = require('../middleware/advancedResults');
 const { protect, authorize } = require('../middleware/auth');
 
 router.route('/customers').get(protect, authorize('Admin'), getCustomers);
