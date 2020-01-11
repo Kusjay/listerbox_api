@@ -6,6 +6,8 @@ const asyncHandler = require('../middleware/async');
 const Payment = require('../models/Payment');
 const Task = require('../models/Task');
 const User = require('../models/User');
+const Profile = require('../models/Profile');
+const sendEmail = require('../utils/sendEmail');
 
 // @desc    Get all customers
 // @route   GET /api/v1/payements/customers
@@ -95,6 +97,7 @@ exports.initializePayment = asyncHandler(async (req, res, next) => {
         let paymentdetails = {
           user: user['_id'],
           task: task['_id'],
+          amount: task.price,
           referenceID: referenceID,
           accessCode: data['data']['access_code'],
           status: 'Init'
@@ -113,6 +116,17 @@ exports.initializePayment = asyncHandler(async (req, res, next) => {
           reference_id: referenceID
         };
         res.status(200).json({ status: 'success', data: responseData });
+
+        // Send email to tasker after user pays for a service
+        const profile = await Profile.findById({ _id: task.profile });
+
+        const message = `Hi ${profile.name}, you just got an offer on your service '${task.title}'. Please login to your dashboard to get your task started`;
+
+        await sendEmail({
+          email: profile.email,
+          subject: 'Task Request',
+          message
+        });
       } else {
         res.status(400).json({ status: 'failed', message: data['message'] });
       }
