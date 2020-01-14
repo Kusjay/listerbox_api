@@ -2,6 +2,7 @@ const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const Request = require('../models/Request');
 const Task = require('../models/Task');
+const Profile = require('../models/Profile');
 
 // @desc    Add request
 // @route   POST /api/v1/tasks/:taskId/requests
@@ -24,6 +25,159 @@ exports.addRequest = asyncHandler(async (req, res, next) => {
     success: true,
     date: request
   });
+});
+
+// @desc    Accept request
+// @route   PUT /api/v1/request/acceptrequest/:id
+// @access  Private
+exports.acceptRequest = asyncHandler(async (req, res, next) => {
+  let request = await Request.findById(req.params.id);
+
+  if (!request) {
+    return next(
+      new ErrorResponse(`No request with the id of ${req.params.id}`, 404)
+    );
+  }
+
+  let alltask = await Task.find({ user: req.user.id });
+
+  if (alltask.length == 0) {
+    return next(
+      new ErrorResponse(`No task associated with user ${req.user.id}`, 404)
+    );
+  }
+
+  //get task user id
+  const task = alltask[0].user;
+
+  // get task id
+  const taskID = alltask[0]._id;
+
+  console.log(taskID);
+  console.log(request.task);
+
+  if (
+    task == req.user.id ||
+    (req.user.role == 'Admin' && request.task == taskID)
+  ) {
+    request = await Request.findByIdAndUpdate(
+      req.params.id,
+      { status: 'Accepted' },
+      {
+        new: true,
+        runValidators: true
+      }
+    );
+
+    res.status(200).json({
+      success: true,
+      data: request
+    });
+  } else {
+    return next(new ErrorResponse(`Not authorized to accept request`, 401));
+  }
+});
+
+// @desc    Complete request
+// @route   PUT /api/v1/request/completerequest/:id
+// @access  Private
+exports.completeRequest = asyncHandler(async (req, res, next) => {
+  let request = await Request.findById(req.params.id);
+
+  if (!request) {
+    return next(
+      new ErrorResponse(`No request with the id of ${req.params.id}`, 404)
+    );
+  }
+
+  let alltask = await Task.find({ user: req.user.id });
+
+  if (alltask.length == 0) {
+    return next(
+      new ErrorResponse(`No task associated with user ${req.user.id}`, 404)
+    );
+  }
+
+  //get task user id
+  const task = alltask[0].user;
+
+  // get task id
+  const taskID = alltask[0]._id;
+
+  console.log(taskID);
+  console.log(request.task);
+
+  if (
+    task == req.user.id ||
+    (req.user.role == 'Admin' && request.task == taskID)
+  ) {
+    request = await Request.findByIdAndUpdate(
+      req.params.id,
+      { status: 'Completed' },
+      {
+        new: true,
+        runValidators: true
+      }
+    );
+
+    res.status(200).json({
+      success: true,
+      data: request
+    });
+  } else {
+    return next(new ErrorResponse(`Not authorized to accept request`, 401));
+  }
+});
+
+// @desc    Reject request
+// @route   PUT /api/v1/request/rejectrequest/:id
+// @access  Private
+exports.rejectRequest = asyncHandler(async (req, res, next) => {
+  let request = await Request.findById(req.params.id);
+
+  if (!request) {
+    return next(
+      new ErrorResponse(`No request with the id of ${req.params.id}`, 404)
+    );
+  }
+
+  let alltask = await Task.find({ user: req.user.id });
+
+  if (alltask.length == 0) {
+    return next(
+      new ErrorResponse(`No task associated with user ${req.user.id}`, 404)
+    );
+  }
+
+  //get task user id
+  const task = alltask[0].user;
+
+  // get task id
+  const taskID = alltask[0]._id;
+
+  console.log(taskID);
+  console.log(request.task);
+
+  if (
+    task == req.user.id ||
+    (req.user.role == 'Admin' && request.task == taskID)
+  ) {
+    request = await Request.findByIdAndUpdate(
+      req.params.id,
+      { status: 'Rejected' },
+      {
+        new: true,
+        runValidators: true
+      }
+    );
+
+    res.status(200).json({
+      success: true,
+      data: request
+    });
+  } else {
+    return next(new ErrorResponse(`Not authorized to accept request`, 401));
+  }
 });
 
 // @desc    Get all requests

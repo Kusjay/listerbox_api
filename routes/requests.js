@@ -4,7 +4,10 @@ const {
   getRequests,
   getRequest,
   updateRequest,
-  deleteRequest
+  deleteRequest,
+  acceptRequest,
+  rejectRequest,
+  completeRequest
 } = require('../controllers/requests');
 
 const Request = require('../models/Request');
@@ -29,5 +32,17 @@ router
   .get(protect, authorize('User', 'Admin'), getRequest)
   .put(protect, authorize('User', 'Admin'), updateRequest)
   .delete(protect, authorize('Admin'), deleteRequest);
+
+router
+  .route('/acceptrequest/:id')
+  .put(protect, authorize('Tasker', 'Admin'), acceptRequest);
+
+router
+  .route('/completerequest/:id')
+  .put(protect, authorize('Tasker', 'Admin'), completeRequest);
+
+router
+  .route('/rejectrequest/:id')
+  .put(protect, authorize('Tasker', 'Admin'), rejectRequest);
 
 module.exports = router;
