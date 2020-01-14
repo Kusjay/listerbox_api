@@ -34,6 +34,13 @@ const RequestSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please add a description to your request']
   },
+  status: {
+    type: [String],
+    require: true,
+    enum: ['Init', 'Accepted', 'Rejected', 'Completed'],
+    default: 'Init',
+    required: true
+  },
   createdAt: {
     type: Date,
     default: Date.now
