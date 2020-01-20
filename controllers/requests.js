@@ -92,42 +92,44 @@ exports.completeRequestUser = asyncHandler(async (req, res, next) => {
     );
   }
 
-  let alltask = await Task.find({ user: req.user.id });
-
-  if (alltask.length == 0) {
+  //Check if the user created the request
+  if (request.user != req.user.id) {
     return next(
-      new ErrorResponse(`No task associated with user ${req.user.id}`, 404)
+      new ErrorResponse(
+        'User is not authorized to mark this service as completed'
+      )
     );
   }
 
-  //get task user id
-  const task = alltask[0].user;
+  // Get the tasker details
+  let taskerDetails = await Task.find({ _id: request.task });
 
-  // get task id
-  const taskID = alltask[0]._id;
+  let tasker = await User.find({ _id: taskerDetails[0].user });
 
-  console.log(taskID);
-  console.log(request.task);
+  request = await Request.findByIdAndUpdate(
+    req.params.id,
+    { status: 'Completed' },
+    {
+      new: true,
+      runValidators: true
+    }
+  );
 
-  if (
-    task == req.user.id ||
-    (req.user.role == 'Admin' && request.task == taskID)
-  ) {
-    request = await Request.findByIdAndUpdate(
-      req.params.id,
-      { status: 'Completed' },
-      {
-        new: true,
-        runValidators: true
-      }
-    );
+  res.status(200).json({
+    success: true,
+    data: request
+  });
 
-    res.status(200).json({
-      success: true,
-      data: request
+  const message = `Hi ${tasker[0].name}, ${req.user.name} is satified with your service, and has marked the service '${taskerDetails[0].title}' as completed.`;
+
+  try {
+    await sendEmail({
+      email: tasker[0].email,
+      subject: `Service Completion from ${req.user.name}`,
+      message
     });
-  } else {
-    return next(new ErrorResponse(`Not authorized to complete request`, 401));
+  } catch (err) {
+    console.log(err);
   }
 });
 
@@ -157,9 +159,6 @@ exports.completeRequestTasker = asyncHandler(async (req, res, next) => {
 
   // get task id
   const taskID = alltask[0]._id;
-
-  // get task profile id
-  // const taskProfile = alltask[0].profile;
 
   // Get the user email that matches the specific task requested for
   let userprofileDetails = await User.find({ _id: request.user });

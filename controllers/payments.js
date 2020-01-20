@@ -116,17 +116,6 @@ exports.initializePayment = asyncHandler(async (req, res, next) => {
           reference_id: referenceID
         };
         res.status(200).json({ status: 'success', data: responseData });
-
-        // Send email to tasker after user pays for a service
-        // const profile = await Profile.findById({ _id: task.profile });
-
-        // const message = `Hi ${profile.name}, you just got an offer on your service '${task.title}'. Please login to your dashboard to get your task started`;
-
-        // await sendEmail({
-        //   email: profile.email,
-        //   subject: 'Task Request',
-        //   message
-        // });
       } else {
         res.status(400).json({ status: 'failed', message: data['message'] });
       }
