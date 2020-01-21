@@ -7,7 +7,8 @@ const {
   deleteRequest,
   acceptRequest,
   rejectRequest,
-  completeRequest
+  completeRequestUser,
+  completeRequestTasker
 } = require('../controllers/requests');
 
 const Request = require('../models/Request');
@@ -22,7 +23,7 @@ router
   .post(protect, authorize('User', 'Admin'), addRequest)
   .get(
     protect,
-    authorize('User', 'Admin'),
+    authorize('Admin'),
     advancedResults(Request, { path: 'task', select: 'title' }),
     getRequests
   );
@@ -38,8 +39,12 @@ router
   .put(protect, authorize('Tasker', 'Admin'), acceptRequest);
 
 router
-  .route('/completerequest/:id')
-  .put(protect, authorize('Tasker', 'Admin'), completeRequest);
+  .route('/completerequestuser/:id')
+  .put(protect, authorize('User', 'Admin'), completeRequestUser);
+
+router
+  .route('/completerequesttasker/:id')
+  .put(protect, authorize('Tasker', 'Admin'), completeRequestTasker);
 
 router
   .route('/rejectrequest/:id')

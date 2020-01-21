@@ -116,17 +116,6 @@ exports.initializePayment = asyncHandler(async (req, res, next) => {
           reference_id: referenceID
         };
         res.status(200).json({ status: 'success', data: responseData });
-
-        // Send email to tasker after user pays for a service
-        const profile = await Profile.findById({ _id: task.profile });
-
-        const message = `Hi ${profile.name}, you just got an offer on your service '${task.title}'. Please login to your dashboard to get your task started`;
-
-        await sendEmail({
-          email: profile.email,
-          subject: 'Task Request',
-          message
-        });
       } else {
         res.status(400).json({ status: 'failed', message: data['message'] });
       }
@@ -205,11 +194,30 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
             }
           );
           res.status(200).json({ status: 'success', data: paymentData });
+
+          // Send email to tasker after user pays for a service
+          // const profile = await Profile.findById({ _id: task.profile });
+
+          // Get task details for a particular tasker
+          let taskerDetails = await Task.find({ _id: paymentData.task });
+          let taskerUser = taskerDetails[0].user;
+
+          // Get user details for a particular tasker
+          let taskerUserDetails = await User.find({ _id: taskerUser });
+
+          const message = `Hi ${taskerUserDetails[0].name}, you just got an offer on your service '${taskerDetails[0].title}'. Please login to your dashboard to get your task started`;
+
+          await sendEmail({
+            email: taskerUserDetails[0].email,
+            subject: 'Task Request',
+            message
+          });
         } else {
           res
             .status(404)
             .json({ status: 'failed', message: verifiedData['message'] });
         }
+
         return;
       });
     })
