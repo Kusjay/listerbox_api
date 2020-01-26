@@ -39,8 +39,8 @@ app.use(cookieParser());
 // File uploading
 app.use(fileupload());
 
-// Sanitize data
-app.use(mongoSanitize);
+// // Sanitize data
+app.use(mongoSanitize());
 
 // Set security headers
 app.use(helmet());
