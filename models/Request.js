@@ -1,21 +1,21 @@
-const mongoose = require('mongoose');
-const geocoder = require('../utils/geocoder');
+const mongoose = require("mongoose");
+const geocoder = require("../utils/geocoder");
 
 const RequestSchema = new mongoose.Schema({
   address: {
     type: String,
-    required: [true, 'Please add a location for your request'],
+    required: [true, "Please add a location for your request"],
     maxlength: 100
   },
   location: {
     // GeoJSON Point
     type: {
       type: String,
-      enum: ['Point']
+      enum: ["Point"]
     },
     coordinates: {
       type: [Number],
-      index: '2dsphere'
+      index: "2dsphere"
     },
     formattedAddress: String,
     street: String,
@@ -32,13 +32,13 @@ const RequestSchema = new mongoose.Schema({
   },
   description: {
     type: String,
-    required: [true, 'Please add a description to your request']
+    required: [true, "Please add a description to your request"]
   },
   status: {
     type: [String],
     require: true,
-    enum: ['Init', 'Accepted', 'Rejected', 'Completed'],
-    default: 'Init',
+    enum: ["Init", "Accepted", "Rejected", "Completed", "Cancelled"],
+    default: "Init",
     required: true
   },
   createdAt: {
@@ -47,21 +47,21 @@ const RequestSchema = new mongoose.Schema({
   },
   task: {
     type: mongoose.Schema.ObjectId,
-    ref: 'Task',
+    ref: "Task",
     required: true
   },
   user: {
     type: mongoose.Schema.ObjectId,
-    ref: 'User',
+    ref: "User",
     required: true
   }
 });
 
 // Geocode & create location field
-RequestSchema.pre('save', async function(next) {
+RequestSchema.pre("save", async function(next) {
   const loc = await geocoder.geocode(this.address);
   this.location = {
-    type: 'Point',
+    type: "Point",
     coordinates: [loc[0].longitude, loc[0].latitude],
     formattedAddress: loc[0].formattedAddress,
     street: loc[0].streetName,
@@ -76,4 +76,4 @@ RequestSchema.pre('save', async function(next) {
   next();
 });
 
-module.exports = mongoose.model('Request', RequestSchema);
+module.exports = mongoose.model("Request", RequestSchema);

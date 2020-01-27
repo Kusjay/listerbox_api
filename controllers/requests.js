@@ -1,10 +1,10 @@
-const ErrorResponse = require('../utils/errorResponse');
-const asyncHandler = require('../middleware/async');
-const Request = require('../models/Request');
-const Task = require('../models/Task');
-const Profile = require('../models/Profile');
-const User = require('../models/User');
-const sendEmail = require('../utils/sendEmail');
+const ErrorResponse = require("../utils/errorResponse");
+const asyncHandler = require("../middleware/async");
+const Request = require("../models/Request");
+const Task = require("../models/Task");
+const Profile = require("../models/Profile");
+const User = require("../models/User");
+const sendEmail = require("../utils/sendEmail");
 
 // @desc    Add request
 // @route   POST /api/v1/tasks/:taskId/requests
@@ -60,11 +60,11 @@ exports.acceptRequest = asyncHandler(async (req, res, next) => {
 
   if (
     task == req.user.id ||
-    (req.user.role == 'Admin' && request.task == taskID)
+    (req.user.role == "Admin" && request.task == taskID)
   ) {
     request = await Request.findByIdAndUpdate(
       req.params.id,
-      { status: 'Accepted' },
+      { status: "Accepted" },
       {
         new: true,
         runValidators: true
@@ -96,7 +96,7 @@ exports.completeRequestUser = asyncHandler(async (req, res, next) => {
   if (request.user != req.user.id) {
     return next(
       new ErrorResponse(
-        'User is not authorized to mark this service as completed'
+        "User is not authorized to mark this service as completed"
       )
     );
   }
@@ -108,7 +108,7 @@ exports.completeRequestUser = asyncHandler(async (req, res, next) => {
 
   request = await Request.findByIdAndUpdate(
     req.params.id,
-    { status: 'Completed' },
+    { status: "Completed" },
     {
       new: true,
       runValidators: true
@@ -171,7 +171,7 @@ exports.completeRequestTasker = asyncHandler(async (req, res, next) => {
   // Check if the task belongs to the tasker or user is admin, and the request belongs to the specific task
   if (
     task == req.user.id ||
-    (req.user.role == 'Admin' && request.task == taskID)
+    (req.user.role == "Admin" && request.task == taskID)
   ) {
     const message = `Hi ${userprofileDetails[0].name}, Tasker ${req.user.name} has requested to mark the service '${taskTitle}' as completed. Login into your dashboard to mark this service as completed, If you're satisfied with the service`;
 
@@ -184,12 +184,12 @@ exports.completeRequestTasker = asyncHandler(async (req, res, next) => {
 
       return res.status(200).json({
         success: true,
-        data: 'Email sent'
+        data: "Email sent"
       });
     } catch (err) {
       console.log(err);
 
-      return next(new ErrorResponse('Email could not be sent', 500));
+      return next(new ErrorResponse("Email could not be sent", 500));
     }
   } else {
     return next(new ErrorResponse(`Not authorized to complete request`, 401));
@@ -227,11 +227,11 @@ exports.rejectRequest = asyncHandler(async (req, res, next) => {
 
   if (
     task == req.user.id ||
-    (req.user.role == 'Admin' && request.task == taskID)
+    (req.user.role == "Admin" && request.task == taskID)
   ) {
     request = await Request.findByIdAndUpdate(
       req.params.id,
-      { status: 'Rejected' },
+      { status: "Rejected" },
       {
         new: true,
         runValidators: true
@@ -244,6 +244,57 @@ exports.rejectRequest = asyncHandler(async (req, res, next) => {
     });
   } else {
     return next(new ErrorResponse(`Not authorized to reject request`, 401));
+  }
+});
+
+// @desc    Cancel request fom user
+// @route   PUT /api/v1/request/cancelrequest/:id
+// @access  Private
+exports.cancelRequest = asyncHandler(async (req, res, next) => {
+  let request = await Request.findById(req.params.id);
+
+  if (!request) {
+    return next(
+      new ErrorResponse(`No request with the id of ${req.params.id}`, 404)
+    );
+  }
+
+  //Check if the user created the request
+  if (request.user != req.user.id) {
+    return next(
+      new ErrorResponse("User is not authorized to cancel this request")
+    );
+  }
+
+  // Get the tasker details
+  let taskerDetails = await Task.find({ _id: request.task });
+
+  let tasker = await User.find({ _id: taskerDetails[0].user });
+
+  request = await Request.findByIdAndUpdate(
+    req.params.id,
+    { status: "Cancelled" },
+    {
+      new: true,
+      runValidators: true
+    }
+  );
+
+  res.status(200).json({
+    success: true,
+    data: request
+  });
+
+  const message = `Hi ${tasker[0].name}, ${req.user.name} just cancelled your service '${taskerDetails[0].title}'.`;
+
+  try {
+    await sendEmail({
+      email: tasker[0].email,
+      subject: `Service Cancellation from ${req.user.name}`,
+      message
+    });
+  } catch (err) {
+    console.log(err);
   }
 });
 
@@ -270,8 +321,8 @@ exports.getRequests = asyncHandler(async (req, res, next) => {
 // @access  Private
 exports.getRequest = asyncHandler(async (req, res, next) => {
   const request = await Request.findById(req.params.id).populate({
-    path: 'task',
-    select: 'title'
+    path: "task",
+    select: "title"
   });
 
   if (!request) {
@@ -300,7 +351,7 @@ exports.updateRequest = asyncHandler(async (req, res, next) => {
   }
 
   // Make sure the request belongs to user or user is admin
-  if (request.user.toString() !== req.user.id && req.user.role !== 'Admin') {
+  if (request.user.toString() !== req.user.id && req.user.role !== "Admin") {
     return next(new ErrorResponse(`Not authorized to update request`, 401));
   }
 
@@ -328,7 +379,7 @@ exports.deleteRequest = asyncHandler(async (req, res, next) => {
   }
 
   // Make sure only admin can delete request
-  if (req.user.role !== 'Admin') {
+  if (req.user.role !== "Admin") {
     return next(new ErrorResponse(`Not authorized to delete request`, 401));
   }
 

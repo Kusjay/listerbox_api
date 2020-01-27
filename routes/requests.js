@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require("express");
 const {
   addRequest,
   getRequests,
@@ -8,46 +8,51 @@ const {
   acceptRequest,
   rejectRequest,
   completeRequestUser,
-  completeRequestTasker
-} = require('../controllers/requests');
+  completeRequestTasker,
+  cancelRequest
+} = require("../controllers/requests");
 
-const Request = require('../models/Request');
+const Request = require("../models/Request");
 
 const router = express.Router({ mergeParams: true });
 
-const advancedResults = require('../middleware/advancedResults');
-const { protect, authorize } = require('../middleware/auth');
+const advancedResults = require("../middleware/advancedResults");
+const { protect, authorize } = require("../middleware/auth");
 
 router
-  .route('/')
-  .post(protect, authorize('User', 'Admin'), addRequest)
+  .route("/")
+  .post(protect, authorize("User", "Admin"), addRequest)
   .get(
     protect,
-    authorize('Admin'),
-    advancedResults(Request, { path: 'task', select: 'title' }),
+    authorize("Admin"),
+    advancedResults(Request, { path: "task", select: "title" }),
     getRequests
   );
 
 router
-  .route('/:id')
-  .get(protect, authorize('User', 'Admin'), getRequest)
-  .put(protect, authorize('User', 'Admin'), updateRequest)
-  .delete(protect, authorize('Admin'), deleteRequest);
+  .route("/:id")
+  .get(protect, authorize("User", "Admin"), getRequest)
+  .put(protect, authorize("User", "Admin"), updateRequest)
+  .delete(protect, authorize("Admin"), deleteRequest);
 
 router
-  .route('/acceptrequest/:id')
-  .put(protect, authorize('Tasker', 'Admin'), acceptRequest);
+  .route("/acceptrequest/:id")
+  .put(protect, authorize("Tasker", "Admin"), acceptRequest);
 
 router
-  .route('/completerequestuser/:id')
-  .put(protect, authorize('User', 'Admin'), completeRequestUser);
+  .route("/completerequestuser/:id")
+  .put(protect, authorize("User", "Admin"), completeRequestUser);
 
 router
-  .route('/completerequesttasker/:id')
-  .put(protect, authorize('Tasker', 'Admin'), completeRequestTasker);
+  .route("/completerequesttasker/:id")
+  .put(protect, authorize("Tasker", "Admin"), completeRequestTasker);
 
 router
-  .route('/rejectrequest/:id')
-  .put(protect, authorize('Tasker', 'Admin'), rejectRequest);
+  .route("/rejectrequest/:id")
+  .put(protect, authorize("Tasker", "Admin"), rejectRequest);
+
+router
+  .route("/cancelrequest/:id")
+  .put(protect, authorize("User", "Admin"), cancelRequest);
 
 module.exports = router;
