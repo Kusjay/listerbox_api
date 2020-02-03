@@ -8,7 +8,8 @@ const {
   acceptRequest,
   rejectRequest,
   completeRequestUser,
-  completeRequestTasker
+  completeRequestTasker,
+  cancelRequest
 } = require('../controllers/requests');
 
 const Request = require('../models/Request');
@@ -49,5 +50,9 @@ router
 router
   .route('/rejectrequest/:id')
   .put(protect, authorize('Tasker', 'Admin'), rejectRequest);
+
+router
+  .route('/cancelrequest/:id')
+  .put(protect, authorize('User', 'Admin'), cancelRequest);
 
 module.exports = router;
