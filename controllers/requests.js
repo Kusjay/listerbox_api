@@ -247,6 +247,57 @@ exports.rejectRequest = asyncHandler(async (req, res, next) => {
   }
 });
 
+// @desc Cancel request from user
+// @route PUT /api/v1/request/cancelrequest/:id
+// @access Private
+exports.cancelRequest = asyncHandler(async (req, res, next) => {
+  let request = await Request.findById(req.params.id);
+
+  if (!request) {
+    return next(
+      new ErrorResponse(`No request with the id of ${req.params.id}`, 404)
+    );
+  }
+
+  // Check if the user created the request
+  if (request.user != req.user.id) {
+    return next(
+      new ErrorResponse('User is not authorized to cancel this request')
+    );
+  }
+
+  // Get the tasker details
+  let taskerDetails = await Task.find({ _id: request.task });
+
+  let tasker = await User.find({ _id: taskerDetails[0].user });
+
+  request = await Request.findByIdAndUpdate(
+    req.params.id,
+    { status: 'Cancelled' },
+    {
+      new: true,
+      runValidators: true
+    }
+  );
+
+  res.status(200).json({
+    success: true,
+    data: request
+  });
+
+  const message = `Hi ${tasker[0].name}, ${req.user.name} just cancelled your service '${taskerDetails[0].title}'.`;
+
+  try {
+    await sendEmail({
+      email: tasker[0].email,
+      subject: `Service Cancellation from ${req.user.name}`,
+      message
+    });
+  } catch (err) {
+    console.log(err);
+  }
+});
+
 // @desc    Get all requests
 // @desc    GET /api/v1/requests
 // @route   GET /api/v1/tasks/:taskId/requests
