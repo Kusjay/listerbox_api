@@ -10,11 +10,7 @@ const {
   completeRequestUser,
   completeRequestTasker,
   cancelRequest
-<<<<<<< HEAD
 } = require("../controllers/requests");
-=======
-} = require('../controllers/requests');
->>>>>>> ba9eba9a4affcdb1e1d419293b6a6a9a39289f64
 
 const Request = require("../models/Request");
 
@@ -60,7 +56,7 @@ router
   .put(protect, authorize("User", "Admin"), cancelRequest);
 
 router
-  .route('/cancelrequest/:id')
-  .put(protect, authorize('User', 'Admin'), cancelRequest);
+  .route("/cancelrequest/:id")
+  .put(protect, authorize("User", "Admin"), cancelRequest);
 
 module.exports = router;
