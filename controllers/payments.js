@@ -1,13 +1,13 @@
-const https = require('https');
-const paystack = require('paystack')(process.env.SECRET_KEY);
+const https = require("https");
+const paystack = require("paystack")(process.env.SECRET_KEY);
 
-const ErrorResponse = require('../utils/errorResponse');
-const asyncHandler = require('../middleware/async');
-const Payment = require('../models/Payment');
-const Task = require('../models/Task');
-const User = require('../models/User');
-const Profile = require('../models/Profile');
-const sendEmail = require('../utils/sendEmail');
+const ErrorResponse = require("../utils/errorResponse");
+const asyncHandler = require("../middleware/async");
+const Payment = require("../models/Payment");
+const Task = require("../models/Task");
+const User = require("../models/User");
+const Profile = require("../models/Profile");
+const sendEmail = require("../utils/sendEmail");
 
 // @desc    Get all customers
 // @route   GET /api/v1/payements/customers
@@ -29,10 +29,10 @@ exports.getCustomers = asyncHandler(async (req, res, next) => {
 exports.initializePayment = asyncHandler(async (req, res, next) => {
   let taskID = req.params.taskID;
   taskID = taskID.trim();
-  if (taskID == '') {
+  if (taskID == "") {
     res
       .status(400)
-      .json({ status: 'failed', message: 'please enter valid task id!' });
+      .json({ status: "failed", message: "please enter valid task id!" });
     return;
   }
   // await Payment.find({ task: taskID, status: 'Paid' }, (err, paymentInfo) => {
@@ -44,7 +44,7 @@ exports.initializePayment = asyncHandler(async (req, res, next) => {
   // });
   let task = await Task.findById(taskID, (err, task) => {
     if (err) {
-      res.status(404).json({ status: 'failed', message: err.message });
+      res.status(404).json({ status: "failed", message: err.message });
       return;
     }
     return task;
@@ -52,7 +52,7 @@ exports.initializePayment = asyncHandler(async (req, res, next) => {
 
   let user = await User.findById(task.user, (err, user) => {
     if (err) {
-      res.status(404).json({ status: 'failed', message: err.message });
+      res.status(404).json({ status: "failed", message: err.message });
       return;
     }
     return user;
@@ -63,10 +63,10 @@ exports.initializePayment = asyncHandler(async (req, res, next) => {
   var options = {
     host: process.env.PAYMENT_HOST,
     path: `/transaction/initialize/`,
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${process.env.SECRET_KEY}`,
-      'Content-Type': 'application/json'
+      "Content-Type": "application/json"
     }
   };
 
@@ -82,48 +82,48 @@ exports.initializePayment = asyncHandler(async (req, res, next) => {
     amount: task.price * 100,
     email: user.email,
     callback_url: `${req.protocol}://${req.get(
-      'host'
+      "host"
     )}/api/v1/payments/verify/${referenceID}` // paste here web url which will call api url of success
   });
 
-  let data = '';
+  let data = "";
   var paymentreq = https.request(options, paymentRes => {
-    paymentRes.on('data', chunk => {
+    paymentRes.on("data", chunk => {
       data += chunk;
     });
-    paymentRes.on('end', async () => {
+    paymentRes.on("end", async () => {
       data = JSON.parse(data);
-      if (data['status']) {
+      if (data["status"]) {
         let paymentdetails = {
-          user: user['_id'],
-          task: task['_id'],
+          user: req.user.id,
+          task: task["_id"],
           amount: task.price,
           referenceID: referenceID,
-          accessCode: data['data']['access_code'],
-          status: 'Init'
+          accessCode: data["data"]["access_code"],
+          status: "Init"
         };
         await Payment.create(paymentdetails, (e, p) => {
           if (e) {
             res.status(500).json({
-              status: 'failed',
-              message: 'Error while inserting payment details!'
+              status: "failed",
+              message: "Error while inserting payment details!"
             });
           }
         });
 
         let responseData = {
-          payment_url: data['data']['authorization_url'],
+          payment_url: data["data"]["authorization_url"],
           reference_id: referenceID
         };
-        res.status(200).json({ status: 'success', data: responseData });
+        res.status(200).json({ status: "success", data: responseData });
       } else {
-        res.status(400).json({ status: 'failed', message: data['message'] });
+        res.status(400).json({ status: "failed", message: data["message"] });
       }
       return;
     });
   });
 
-  paymentreq.on('error', e => {
+  paymentreq.on("error", e => {
     res.json(e);
     return;
     // console.error(`problem with request: ${e.message}`);
@@ -137,63 +137,63 @@ exports.initializePayment = asyncHandler(async (req, res, next) => {
 exports.verifyPayment = asyncHandler(async (req, res, next) => {
   let referenceID = req.params.referenceID;
   referenceID = referenceID.trim();
-  if (referenceID == '') {
+  if (referenceID == "") {
     res
       .status(400)
-      .json({ status: 'failed', message: 'please enter valid task id!' });
+      .json({ status: "failed", message: "please enter valid task id!" });
     return;
   }
   let paymentData = await Payment.findOne(
     { referenceID: referenceID },
     (err, paymenData) => {
       if (err) {
-        res.status(404).json({ status: 'failed', message: err.message });
+        res.status(404).json({ status: "failed", message: err.message });
         return;
       }
       return paymenData;
     }
   );
-  if (paymentData['status'][0] === 'Paid') {
-    res.status(200).json({ status: 'success', data: paymentData });
+  if (paymentData["status"][0] === "Paid") {
+    res.status(200).json({ status: "success", data: paymentData });
     return;
   }
 
   // calls to verify trasaction
   let options = {
     hostname: process.env.PAYMENT_HOST,
-    path: `/transaction/verify/${paymentData['referenceID']}`,
+    path: `/transaction/verify/${paymentData["referenceID"]}`,
     headers: {
       Authorization: `Bearer ${process.env.SECRET_KEY}`
     }
   };
   https
     .get(options, resp => {
-      let data = '';
-      resp.on('data', chunk => {
+      let data = "";
+      resp.on("data", chunk => {
         data += chunk;
       });
 
-      resp.on('end', async () => {
+      resp.on("end", async () => {
         verifiedData = JSON.parse(data);
         if (
-          verifiedData['status'] &&
-          verifiedData['data']['status'] === 'success'
+          verifiedData["status"] &&
+          verifiedData["data"]["status"] === "success"
         ) {
           paymentData = await Payment.findOneAndUpdate(
-            { referenceID: paymentData['referenceID'] },
-            { status: 'Paid', paidAt: verifiedData['data']['paid_at'] },
+            { referenceID: paymentData["referenceID"] },
+            { status: "Paid", paidAt: verifiedData["data"]["paid_at"] },
             (e, pd) => {
               if (e) {
                 // create log in db of failed updations
                 res.status(404).json({
-                  status: 'failed',
-                  message: 'Unable to update payment status'
+                  status: "failed",
+                  message: "Unable to update payment status"
                 });
               }
               return pd;
             }
           );
-          res.status(200).json({ status: 'success', data: paymentData });
+          res.status(200).json({ status: "success", data: paymentData });
 
           // Send email to tasker after user pays for a service
           // const profile = await Profile.findById({ _id: task.profile });
@@ -209,20 +209,20 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
 
           await sendEmail({
             email: taskerUserDetails[0].email,
-            subject: 'Task Request',
+            subject: "Task Request",
             message
           });
         } else {
           res
             .status(404)
-            .json({ status: 'failed', message: verifiedData['message'] });
+            .json({ status: "failed", message: verifiedData["message"] });
         }
 
         return;
       });
     })
-    .on('error', err => {
-      res.status(400).json({ status: 'failed', message: err.message });
+    .on("error", err => {
+      res.status(400).json({ status: "failed", message: err.message });
       return;
     });
 });
@@ -233,16 +233,16 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
 exports.getTransaction = asyncHandler(async (req, res, next) => {
   let taskID = req.params.taskID;
   taskID = taskID.trim();
-  if (taskID == '') {
+  if (taskID == "") {
     res
       .status(400)
-      .json({ status: 'failed', message: 'please enter valid task id!' });
+      .json({ status: "failed", message: "please enter valid task id!" });
   }
   let paymentData = await Payment.find(
-    { task: taskID, status: 'Paid' },
+    { task: taskID, status: "Paid" },
     (err, paymenData) => {
       if (err) {
-        res.status(404).json({ status: 'failed', message: err.message });
+        res.status(404).json({ status: "failed", message: err.message });
       }
       return paymenData;
     }
