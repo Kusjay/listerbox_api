@@ -259,7 +259,7 @@ exports.cancelRequest = asyncHandler(async (req, res, next) => {
     );
   }
 
-  //Check if the user created the request
+  // Check if the user created the request
   if (request.user != req.user.id) {
     return next(
       new ErrorResponse("User is not authorized to cancel this request")
