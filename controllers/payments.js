@@ -30,10 +30,11 @@ exports.initializePayment = asyncHandler(async (req, res, next) => {
   let taskID = req.params.taskID;
   taskID = taskID.trim();
   if (taskID == "") {
-    res
-      .status(400)
-      .json({ status: "failed", message: "please enter valid task id!" });
-    return;
+    // res
+    //   .status(400)
+    //   .json({ status: "failed", message: "please enter valid task id!" });
+    // return;
+    return next(new ErrorResponse(`Please enter a task ID`, 400));
   }
   // await Payment.find({ task: taskID, status: 'Paid' }, (err, paymentInfo) => {
   //   if (paymentInfo.length > 0) {
@@ -44,8 +45,11 @@ exports.initializePayment = asyncHandler(async (req, res, next) => {
   // });
   let task = await Task.findById(taskID, (err, task) => {
     if (err) {
-      res.status(404).json({ status: "failed", message: err.message });
-      return;
+      // res.status(404).json({ status: "failed", message: err.message });
+      // return;
+      return next(
+        new ErrorResponse(`No task with the id of ${req.params.taskID}`, 404)
+      );
     }
     return task;
   });
