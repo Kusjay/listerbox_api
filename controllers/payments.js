@@ -231,6 +231,27 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
     });
 });
 
+// @desc    Get a particular transaction by referenceID
+// @route   GET /api/v1/payements/reference/:taskID
+// @access  Private/Admin
+exports.getTransactionReference = asyncHandler(async (req, res, next) => {
+  const reference = await Payment.find({ referenceID: req.params.referenceID });
+
+  if (!reference) {
+    return next(
+      new ErrorResponse(
+        `No payment found with reference id of ${req.params.id}`
+      ),
+      404
+    );
+  }
+
+  res.status(200).json({
+    success: true,
+    data: reference
+  });
+});
+
 // @desc    Get all approved transactions for a particular task
 // @route   GET /api/v1/payements/transaction/:taskID
 // @access  Private/Admin
