@@ -1,14 +1,14 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const PaymentSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.ObjectId,
-    ref: 'User',
+    ref: "User",
     required: true
   },
   task: {
     type: mongoose.Schema.ObjectId,
-    ref: 'Task',
+    ref: "Task",
     required: true
   },
   referenceID: {
@@ -22,10 +22,15 @@ const PaymentSchema = new mongoose.Schema({
   amount: {
     type: Number
   },
+  taskOwner: {
+    type: mongoose.Schema.ObjectId,
+    ref: "User",
+    required: true
+  },
   status: {
     type: [String],
     require: true,
-    enum: ['Init', 'Paid', 'Cancelled'],
+    enum: ["Init", "Paid", "Cancelled"],
     required: true
   },
   paidAt: {
@@ -37,4 +42,4 @@ const PaymentSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model('Payment', PaymentSchema);
+module.exports = mongoose.model("Payment", PaymentSchema);

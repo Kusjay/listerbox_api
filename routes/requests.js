@@ -55,8 +55,4 @@ router
   .route("/cancelrequest/:id")
   .put(protect, authorize("User", "Admin"), cancelRequest);
 
-router
-  .route("/cancelrequest/:id")
-  .put(protect, authorize("User", "Admin"), cancelRequest);
-
 module.exports = router;

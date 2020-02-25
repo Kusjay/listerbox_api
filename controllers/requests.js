@@ -45,7 +45,10 @@ exports.acceptRequest = asyncHandler(async (req, res, next) => {
 
   if (alltask.length == 0) {
     return next(
-      new ErrorResponse(`No task associated with user ${req.user.id}`, 404)
+      new ErrorResponse(
+        `No task request associated with user ${req.user.id}`,
+        404
+      )
     );
   }
 
@@ -75,6 +78,35 @@ exports.acceptRequest = asyncHandler(async (req, res, next) => {
       success: true,
       data: request
     });
+
+    // Send Email to user that tasker has accepted the task
+
+    // Get the user email that matches the specific task requested for
+    let userprofileDetails = await User.find({ _id: request.user });
+    let userprofileEmail = userprofileDetails[0].email;
+
+    // Get the Task title that match the specific request
+    let taskDetails = await Task.find({ _id: request.task });
+    let taskTitle = taskDetails[0].title;
+
+    const message = `Hi ${userprofileDetails[0].name}, Tasker ${req.user.name} has accepted the service '${taskTitle}'.`;
+
+    try {
+      await sendEmail({
+        email: userprofileEmail,
+        subject: `Service Accepted from ${req.user.name}`,
+        message
+      });
+
+      return res.status(200).json({
+        success: true,
+        data: "Email sent"
+      });
+    } catch (err) {
+      console.log(err);
+
+      return next(new ErrorResponse("Email could not be sent", 500));
+    }
   } else {
     return next(new ErrorResponse(`Not authorized to accept request`, 401));
   }

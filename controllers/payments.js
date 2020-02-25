@@ -102,6 +102,7 @@ exports.initializePayment = asyncHandler(async (req, res, next) => {
           user: req.user.id,
           task: task["_id"],
           amount: task.price,
+          taskOwner: user,
           referenceID: referenceID,
           accessCode: data["data"]["access_code"],
           status: "Init"
@@ -144,7 +145,7 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
   if (referenceID == "") {
     res
       .status(400)
-      .json({ status: "failed", message: "please enter valid task id!" });
+      .json({ status: "failed", message: "please enter valid reference id!" });
     return;
   }
   let paymentData = await Payment.findOne(
@@ -199,7 +200,7 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
           );
           res.status(200).json({ status: "success", data: paymentData });
 
-          // Send email to tasker after user pays for a service
+          // Send email to tasker after user pays for a service successfully
           // const profile = await Profile.findById({ _id: task.profile });
 
           // Get task details for a particular tasker
@@ -312,4 +313,44 @@ exports.getTransaction = asyncHandler(async (req, res, next) => {
   //   .on('error', err => {
   //     res.status(400).json({ status: 'failed', message: err.message });
   //   });
+});
+
+// @desc    Get all approved transactions for a particular tasker
+// @route   GET /api/v1/payements/transaction/tasker/:taskID
+// @access  Private/Tasker
+exports.getTransactionForTasker = asyncHandler(async (req, res, next) => {
+  let taskID = req.params.taskID;
+  taskID = taskID.trim();
+  if (taskID == "") {
+    return next(new ErrorResponse(`Please enter valid task id`, 400));
+  }
+
+  // Find all paid tasks
+  let userTrans = await Payment.find({
+    task: req.params.taskID,
+    status: "Paid",
+    taskOwner: req.user.id
+  });
+
+  // Make sure the user owns the task
+  // let user = await Payment.find({ taskOwner: req.user.id });
+
+  // if (!user) {
+  //   return next(new ErrorResponse(`Not authorized to view transactions`, 401));
+  // }
+
+  // if (user[_id])
+
+  // if (!user) {
+  //   return next(new ErrorResponse(`Not authorized to view transactions`, 401));
+  // }
+
+  if (!userTrans || userTrans.length < 1) {
+    return next(new ErrorResponse(`Not authorized to view transactions`, 401));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: userTrans
+  });
 });
