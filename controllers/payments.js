@@ -4,6 +4,7 @@ const paystack = require("paystack")(process.env.SECRET_KEY);
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middleware/async");
 const Payment = require("../models/Payment");
+const Earning = require("../models/Earning");
 const Task = require("../models/Task");
 const User = require("../models/User");
 const Profile = require("../models/Profile");
@@ -84,7 +85,7 @@ exports.initializePayment = asyncHandler(async (req, res, next) => {
   var paymentData = JSON.stringify({
     reference: referenceID, // generate your transaction id
     amount: task.price * 100,
-    email: user.email,
+    email: req.user.email,
     callback_url: `${req.protocol}://${req.get(
       "host"
     )}/api/v1/payments/verify/${referenceID}` // paste here web url which will call api url of success
@@ -107,6 +108,7 @@ exports.initializePayment = asyncHandler(async (req, res, next) => {
           accessCode: data["data"]["access_code"],
           status: "Init"
         };
+
         await Payment.create(paymentdetails, (e, p) => {
           if (e) {
             res.status(500).json({
@@ -315,7 +317,33 @@ exports.getTransaction = asyncHandler(async (req, res, next) => {
   //   });
 });
 
-// @desc    Get all approved transactions for a particular tasker
+// @desc    Get all approved transactions for a particular tasker by userId
+// @route   GET /api/v1/payements/transaction/tasker/:userId
+// @access  Private/Tasker
+exports.getTransactionForTaskerByUserId = asyncHandler(
+  async (req, res, next) => {
+    const transactions = await Payment.find({
+      taskOwner: req.params.userId,
+      status: "Paid"
+    });
+
+    if (!transactions) {
+      return next(
+        new ErrorResponse(
+          `No transaction found with the user id of ${req.params.userId}`
+        ),
+        404
+      );
+    }
+
+    res.status(200).json({
+      success: true,
+      data: transactions
+    });
+  }
+);
+
+// @desc    Get all approved transactions for a particular tasker by taskID
 // @route   GET /api/v1/payements/transaction/tasker/:taskID
 // @access  Private/Tasker
 exports.getTransactionForTasker = asyncHandler(async (req, res, next) => {
@@ -332,22 +360,17 @@ exports.getTransactionForTasker = asyncHandler(async (req, res, next) => {
     taskOwner: req.user.id
   });
 
-  // Make sure the user owns the task
-  // let user = await Payment.find({ taskOwner: req.user.id });
-
-  // if (!user) {
-  //   return next(new ErrorResponse(`Not authorized to view transactions`, 401));
-  // }
-
-  // if (user[_id])
-
-  // if (!user) {
-  //   return next(new ErrorResponse(`Not authorized to view transactions`, 401));
-  // }
-
   if (!userTrans || userTrans.length < 1) {
     return next(new ErrorResponse(`Not authorized to view transactions`, 401));
   }
+
+  const test = { $multiply: [2, 5, 6] };
+
+  console.log(test);
+
+  // console.log(userTrans);
+
+  // let taskerPayments = userTrans.amount
 
   res.status(200).json({
     success: true,

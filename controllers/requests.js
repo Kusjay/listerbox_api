@@ -228,7 +228,7 @@ exports.completeRequestTasker = asyncHandler(async (req, res, next) => {
   }
 });
 
-// @desc    Reject request
+// @desc    Reject request for tasker
 // @route   PUT /api/v1/request/rejectrequest/:id
 // @access  Private
 exports.rejectRequest = asyncHandler(async (req, res, next) => {
@@ -254,9 +254,6 @@ exports.rejectRequest = asyncHandler(async (req, res, next) => {
   // get task id
   const taskID = alltask[0]._id;
 
-  console.log(taskID);
-  console.log(request.task);
-
   if (
     task == req.user.id ||
     (req.user.role == "Admin" && request.task == taskID)
@@ -274,6 +271,35 @@ exports.rejectRequest = asyncHandler(async (req, res, next) => {
       success: true,
       data: request
     });
+
+    // Send Email to user that tasker has rejected the task
+
+    // Get the user email that matches the specific task requested for
+    let userprofileDetails = await User.find({ _id: request.user });
+    let userprofileEmail = userprofileDetails[0].email;
+
+    // Get the Task title that match the specific request
+    let taskDetails = await Task.find({ _id: request.task });
+    let taskTitle = taskDetails[0].title;
+
+    const message = `Hi ${userprofileDetails[0].name}, Tasker ${req.user.name} has rejected the service '${taskTitle}'.`;
+
+    try {
+      await sendEmail({
+        email: userprofileEmail,
+        subject: `Service Rejected from ${req.user.name}`,
+        message
+      });
+
+      return res.status(200).json({
+        success: true,
+        data: "Email sent"
+      });
+    } catch (err) {
+      console.log(err);
+
+      return next(new ErrorResponse("Email could not be sent", 500));
+    }
   } else {
     return next(new ErrorResponse(`Not authorized to reject request`, 401));
   }

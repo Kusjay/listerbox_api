@@ -1,7 +1,8 @@
-const path = require('path');
-const ErrorResponse = require('../utils/errorResponse');
-const asyncHandler = require('../middleware/async');
-const Profile = require('../models/Profile');
+const path = require("path");
+const ErrorResponse = require("../utils/errorResponse");
+const asyncHandler = require("../middleware/async");
+const Profile = require("../models/Profile");
+const Payment = require("../models/Payment");
 
 // @desc    Get all profiles
 // @route   GET /api/v1/profiles
@@ -36,7 +37,7 @@ exports.createProfile = asyncHandler(async (req, res, next) => {
   const createdProfile = await Profile.findOne({ user: req.user.id });
 
   // If the user is not an admin, they can only create one profile
-  if (createdProfile && req.user.role !== 'Admin') {
+  if (createdProfile && req.user.role !== "Admin") {
     return next(
       new ErrorResponse(
         `The user with ID ${req.user.id} has already created a profile`,
@@ -66,7 +67,7 @@ exports.updateProfile = asyncHandler(async (req, res, next) => {
   }
 
   // Make sure user is profile owner
-  if (profile.user.toString() !== req.user.id && req.user.role !== 'Admin') {
+  if (profile.user.toString() !== req.user.id && req.user.role !== "Admin") {
     return next(
       new ErrorResponse(
         `User ${req.user.id} is not authorized to update this profile`,
@@ -96,7 +97,7 @@ exports.deleteProfile = asyncHandler(async (req, res, next) => {
   }
 
   // Make sure user is profile owner
-  if (profile.user.toString() !== req.user.id && req.user.role !== 'Admin') {
+  if (profile.user.toString() !== req.user.id && req.user.role !== "Admin") {
     return next(
       new ErrorResponse(
         `User ${req.user.id} is not authorized to delete this profile`,
@@ -123,7 +124,7 @@ exports.profilePhotoUpload = asyncHandler(async (req, res, next) => {
   }
 
   // Make sure user is profile owner
-  if (profile.user.toString() !== req.user.id && req.user.role !== 'Admin') {
+  if (profile.user.toString() !== req.user.id && req.user.role !== "Admin") {
     return next(
       new ErrorResponse(
         `User ${req.user.id} is not authorized to update this profile`,
@@ -139,7 +140,7 @@ exports.profilePhotoUpload = asyncHandler(async (req, res, next) => {
   const file = req.files.file;
 
   // Make sure the image is a photo
-  if (!file.mimetype.startsWith('image')) {
+  if (!file.mimetype.startsWith("image")) {
     return next(new ErrorResponse(`Please upload an image file`, 400));
   }
 

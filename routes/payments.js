@@ -5,7 +5,8 @@ const {
   verifyPayment,
   getTransaction,
   getTransactionReference,
-  getTransactionForTasker
+  getTransactionForTasker,
+  getTransactionForTaskerByUserId
 } = require("../controllers/payments");
 
 const Payment = require("../models/Payment");
@@ -29,6 +30,10 @@ router.route("/transaction/:taskID").get(protect, getTransaction);
 router
   .route("/transaction/tasker/:taskID")
   .get(protect, authorize("Tasker", "Admin"), getTransactionForTasker);
+
+router
+  .route("/transaction/tasker/:userId")
+  .get(protect, authorize("Tasker", "Admin"), getTransactionForTaskerByUserId);
 
 router
   .route("/reference/:referenceID")
