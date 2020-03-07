@@ -4,6 +4,7 @@ const paystack = require('paystack')(process.env.SECRET_KEY);
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const Payment = require('../models/Payment');
+const Payout = require('../models/Payout');
 const Earning = require('../models/Earning');
 const Task = require('../models/Task');
 const User = require('../models/User');
@@ -192,11 +193,43 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
           );
           res.status(200).json({ status: 'success', data: paymentData });
 
-          // Send email to tasker after user pays for a service successfully
-          // const profile = await Profile.findById({ _id: task.profile });
-
           // Get task details for a particular tasker
           let taskerDetails = await Task.find({ _id: paymentData.task });
+
+          let earning = await Earning.find({
+            taskOwner: taskerDetails[0].user
+          });
+
+          const transactions = await Payment.find({
+            taskOwner: paymentData.taskOwner,
+            status: 'Paid'
+          });
+
+          // Calculate all transactons for Taskers to get net earning
+
+          const getEarning = transactions.map(amt => amt.amount);
+          const getNetEarning = getEarning.reduce(
+            (partial_sum, a) => partial_sum + a,
+            0
+          );
+          const NetEarning = getNetEarning;
+
+          // Save payments to earnings collection
+          req.body.taskOwner = taskerDetails[0].user;
+          req.body.taskId = taskerDetails[0]._id;
+          req.body.payment = paymentData._id;
+          req.body.netEarning = NetEarning;
+
+          if (earning.length == 0) {
+            await Earning.create(req.body);
+            console.log(req.body);
+          } else {
+            // Update the earning collection
+            console.log('Earnings Available');
+          }
+
+          // Send email to tasker after user pays for a service successfully
+          // const profile = await Profile.findById({ _id: task.profile });
           let taskerUser = taskerDetails[0].user;
 
           // Get user details for a particular tasker
@@ -329,3 +362,8 @@ exports.getTransactionForTasker = asyncHandler(async (req, res, next) => {
     data: userTrans
   });
 });
+
+// @desc    Request for a payout by the Tasker
+// @route   GET /api/v1/payements/transaction/payout/:taskID
+// @access  Private/Tasker
+exports.requestPayout = asyncHandler(async (req, res, next) => {});

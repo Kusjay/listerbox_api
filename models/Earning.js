@@ -1,26 +1,32 @@
 const mongoose = require('mongoose');
 
 const EarningSchema = new mongoose.Schema({
-  totalEarning: {
-    type: Number
+  netEarning: {
+    type: Number,
+    default: 0
+  },
+  withdrawn: {
+    type: Number,
+    default: 0
+  },
+  availableForWithdrawal: {
+    type: Number,
+    default: 0
   },
   taskOwner: {
     type: mongoose.Schema.ObjectId,
-    ref: 'User',
-    required: true
+    ref: 'User'
   },
   task: {
     type: mongoose.Schema.ObjectId,
-    ref: 'Task',
-    required: true
+    ref: 'Task'
   },
   payment: {
     type: mongoose.Schema.ObjectId,
     ref: 'Payment'
   },
   referenceID: {
-    type: String,
-    required: true
+    type: String
   },
   createdAt: {
     type: Date,
