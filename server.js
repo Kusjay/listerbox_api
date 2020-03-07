@@ -27,6 +27,7 @@ const users = require('./routes/users');
 const reviews = require('./routes/reviews');
 const requests = require('./routes/requests');
 const payments = require('./routes/payments');
+const payouts = require('./routes/payouts');
 
 const app = express();
 
@@ -73,6 +74,7 @@ app.use('/api/v1/users', users);
 app.use('/api/v1/reviews', reviews);
 app.use('/api/v1/requests', requests);
 app.use('/api/v1/payments', payments);
+app.use('/api/v1/payouts', payouts);
 
 app.use(errorHandler);
 

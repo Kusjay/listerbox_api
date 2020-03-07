@@ -1,24 +1,29 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const PayoutSchema = new mongoose.Schema({
-  task: {
-    type: mongoose.Schema.ObjectId,
-    ref: "Task",
+  amount: {
+    type: Number,
     required: true
   },
-  refereneID: {
+  task: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Task',
+    required: true
+  },
+  referenceID: {
     type: String,
     required: true
   },
   taskOwner: {
     type: mongoose.Schema.ObjectId,
-    ref: "User",
+    ref: 'User',
     required: true
   },
   status: {
     type: [String],
     require: true,
-    enum: ["Pending", "Paid", "Rejected"]
+    enum: ['Init', 'Paid', 'Rejected'],
+    default: 'Init'
   },
   createdAt: {
     type: Date,
@@ -26,4 +31,4 @@ const PayoutSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model("Payout", PayoutSchema);
+module.exports = mongoose.model('Payout', PayoutSchema);
