@@ -55,3 +55,51 @@ exports.requestPayout = asyncHandler(async (req, res, next) => {
     data: payout
   });
 });
+
+// @desc Accept Payout
+// @route PUT /api/v1/payouts/acceptPayout/:taskOwner
+// @access Private/Admin
+exports.acceptPayout = asyncHandler(async (req, res, next) => {
+  let payoutRequest = await Payout.find({ taskOwner: req.params.taskOwner });
+
+  if (!payoutRequest) {
+    return next(
+      new ErrorResponse(`No payout request with id of ${req.params.taskOwner}`)
+    );
+  }
+
+  let payout = await Payout.findOneAndUpdate(
+    { taskOwner: req.params.taskOwner },
+    { status: 'Paid' },
+    { new: true, runValidators: true }
+  );
+
+  res.status(200).json({
+    success: true,
+    data: payout
+  });
+});
+
+// @desc Reject Payout
+// @route PUT /api/v1/payouts/rejectPayout/:taskOwner
+// @access Private/admin
+exports.rejectPayout = asyncHandler(async (req, res, next) => {
+  let payoutRequest = await Payout.find({ taskOwner: req.params.taskOwner });
+
+  if (!payoutRequest) {
+    return next(
+      new ErrorResponse(`No payout request with id of ${req.params.taskOwner}`)
+    );
+  }
+
+  let payout = await Payout.findOneAndUpdate(
+    { taskOwner: req.params.taskOwner },
+    { status: 'Rejected' },
+    { new: true, runValidators: true }
+  );
+
+  res.status(200).json({
+    success: true,
+    data: payout
+  });
+});
