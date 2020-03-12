@@ -39,10 +39,10 @@ exports.requestPayout = asyncHandler(async (req, res, next) => {
   req.body.referenceID = taskerPaymentDetails[0].referenceID;
   req.body.taskOwner = taskerPaymentDetails[0].taskOwner;
 
-  if (req.body.amount > taskerEarning[0].netEarning) {
+  if (req.body.amount > taskerEarning[0].availableForWithdrawal) {
     return next(
       new ErrorResponse(
-        `Amount to be withdrawn is greater than the net earning`,
+        `Amount to be withdrawn is greater than the amount available for withdrawal`,
         400
       )
     );
@@ -61,10 +61,14 @@ exports.requestPayout = asyncHandler(async (req, res, next) => {
 // @access Private/Admin
 exports.acceptPayout = asyncHandler(async (req, res, next) => {
   let payoutRequest = await Payout.find({ taskOwner: req.params.taskOwner });
+  let earningDetails = await Earning.find({ taskOwner: req.params.taskOwner });
 
   if (!payoutRequest) {
     return next(
-      new ErrorResponse(`No payout request with id of ${req.params.taskOwner}`)
+      new ErrorResponse(
+        `No payout request with id of ${req.params.taskOwner}`,
+        404
+      )
     );
   }
 
@@ -74,10 +78,35 @@ exports.acceptPayout = asyncHandler(async (req, res, next) => {
     { new: true, runValidators: true }
   );
 
-  res.status(200).json({
-    success: true,
-    data: payout
-  });
+  const availableForWithdrawal = earningDetails[0].availableForWithdrawal;
+
+  const earningWithdrawn = earningDetails[0].withdrawn;
+
+  const amountWithdrawn = payoutRequest[0].amount;
+
+  // This shows the total of money withdrawn
+  const totalWithdrawn = earningWithdrawn + amountWithdrawn;
+  const availableWithdraw = availableForWithdrawal - totalWithdrawn;
+
+  if (availableForWithdrawal >= totalWithdrawn) {
+    let earning = await Earning.findOneAndUpdate(
+      { taskOwner: req.params.taskOwner },
+      { withdrawn: totalWithdrawn, availableForWithdrawal: availableWithdraw },
+      { new: true, runValidators: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      data: payout
+    });
+  } else {
+    return next(
+      new ErrorResponse(
+        `Amount to be withdrawn is greater than the amount available for withdrawal`,
+        400
+      )
+    );
+  }
 });
 
 // @desc Reject Payout

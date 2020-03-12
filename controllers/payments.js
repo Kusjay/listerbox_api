@@ -219,6 +219,7 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
           req.body.taskId = taskerDetails[0]._id;
           req.body.payment = paymentData._id;
           req.body.netEarning = NetEarning;
+          req.body.availableForWithdrawal = NetEarning;
 
           if (earning.length == 0) {
             await Earning.create(req.body);
