@@ -5,6 +5,7 @@ const Earning = require('../models/Earning');
 const Payment = require('../models/Payment');
 const Payout = require('../models/Payout');
 const User = require('../models/User');
+const Profile = require('../models/Profile');
 const sendEmail = require('../utils/sendEmail');
 
 // @desc Request Payout
@@ -19,6 +20,24 @@ exports.requestPayout = asyncHandler(async (req, res, next) => {
   let taskerEarning = await Earning.find({
     taskOwner: req.params.taskOwnerId
   });
+
+  // Check if the tasker has has an account number and bank name in profile
+  let taskerBankDetails = await Profile.find({ user: req.params.taskOwnerId });
+
+  const taskerAccountNumber = taskerBankDetails[0].accountNumber;
+  const taskerBankName = taskerBankDetails[0].bankName;
+
+  console.log(taskerAccountNumber);
+  console.log(taskerBankName);
+
+  if (taskerAccountNumber == undefined && taskerBankName == undefined) {
+    return next(
+      new ErrorResponse(
+        `No account number and bank name attached to your profile. Please go to your profile and update your account details`,
+        400
+      )
+    );
+  }
 
   if (!taskerPaymentDetails) {
     return next(
@@ -48,14 +67,12 @@ exports.requestPayout = asyncHandler(async (req, res, next) => {
     );
   }
 
-  // const payout = await Payout.create(req.body);
+  const payout = await Payout.create(req.body);
 
-  // res.status(201).json({
-  //   success: true,
-  //   data: payout
-  // });
-
-  console.log('Payout sent');
+  res.status(201).json({
+    success: true,
+    data: payout
+  });
 
   // Sends Email to Listerbox Admin requesting payout
   const tasker = req.user.name;

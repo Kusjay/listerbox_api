@@ -15,6 +15,12 @@ const ProfileSchema = new mongoose.Schema(
       type: Number,
       default: 0
     },
+    accountNumber: {
+      type: Number
+    },
+    bankName: {
+      type: String
+    },
     slug: String,
     description: {
       type: String,
