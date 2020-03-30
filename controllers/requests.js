@@ -80,7 +80,6 @@ exports.acceptRequest = asyncHandler(async (req, res, next) => {
     });
 
     // Send Email to user that tasker has accepted the task
-
     // Get the user email that matches the specific task requested for
     let userprofileDetails = await User.find({ _id: request.user });
     let userprofileEmail = userprofileDetails[0].email;
@@ -96,11 +95,6 @@ exports.acceptRequest = asyncHandler(async (req, res, next) => {
         email: userprofileEmail,
         subject: `Service Accepted from ${req.user.name}`,
         message
-      });
-
-      return res.status(200).json({
-        success: true,
-        data: 'Email sent'
       });
     } catch (err) {
       console.log(err);
