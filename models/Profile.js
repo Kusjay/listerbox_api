@@ -11,10 +11,6 @@ const ProfileSchema = new mongoose.Schema(
       trim: true,
       maxlength: [50, 'Profile name can not be more than 50 characters'],
     },
-    totalEarning: {
-      type: Number,
-      default: 0,
-    },
     accountNumber: {
       type: Number,
       select: false,
