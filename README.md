@@ -1,6 +1,6 @@
 # Listerbox API
 
-> Backend API for the Listerbox application, which is an African online marketplace that connects freelance labour with local demand, allowing users outsource everyday task
+> Backend API for the Listerbox application, that connects freelance labour with local demand, allowing users outsource everyday task.
 
 ## Usage
 
