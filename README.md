@@ -1,6 +1,6 @@
 # Listerbox API
 
-> Backend API for the Listerbox application, that connects freelance labour with local demand, allowing users outsource everyday task.
+> Backend API for the Listerbox application, that connects freelance labour with local demand, allowing users outsource everyday task. https://listerbox.herokuapp.com/
 
 ## Usage
 
